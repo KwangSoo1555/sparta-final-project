@@ -1,0 +1,48 @@
+config:
+  target: 'http://localhost:3333'  # Change this to your server URL
+  phases:
+    - duration: 60  # Duration of the test in seconds
+      arrivalRate: 5  # Number of requests per second
+  processor: './process-response.js'  # Optional: script to process responses, if needed
+
+scenarios:
+  - name: 'Create Chat'
+    flow:
+      - post:
+          url: '/chat-rooms'
+          headers:
+            Content-Type: 'application/json'
+            Authorization: 'Bearer {{ token }}'
+          json:
+            receiverId: 2  # Replace with appropriate receiverId
+            content: 'Hello, World!'
+          capture:
+            - json: '$.data.id'
+              as: 'chatRoomId'
+  
+  - name: 'Find Chat Logs'
+    flow:
+      - get:
+          url: '/chat-rooms/chatlog/{{ chatRoomId }}'
+          headers:
+            Authorization: 'Bearer {{ token }}'
+          capture:
+            - json: '$.data'
+              as: 'chatLogs'
+
+  - name: 'Update Chat'
+    flow:
+      - patch:
+          url: '/chat-rooms/{{ chatRoomId }}/chats/{{ chatId }}'
+          headers:
+            Content-Type: 'application/json'
+            Authorization: 'Bearer {{ token }}'
+          json:
+            content: 'Updated Message'
+  
+  - name: 'Delete Chat'
+    flow:
+      - delete:
+          url: '/chat-rooms/{{ chatRoomId }}/chats/{{ chatId }}'
+          headers:
+            Authorization: 'Bearer {{ token }}'

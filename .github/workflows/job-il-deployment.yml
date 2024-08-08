@@ -4,7 +4,9 @@ name: deploy main to EB
 on:
   push:
     branches:
-      - main
+      - dev
+  pull_request:
+    branches: dev
 
 jobs:
   build:
@@ -60,8 +62,30 @@ jobs:
       - name: Create env file
         run: |
           touch .env
-          echo PORT=3333 >> .env
-          echo NODE_ENV=${{ secrets.NODE_ENV }} >> .env
+          echo "SERVER_PORT=3333" >> .env
+          echo "MYSQL_URI=${{ secrets.MYSQL_URI }}" >> .env
+          echo "ACCESS_TOKEN_SECRET=${{ secrets.ACCESS_TOKEN_SECRET }}" >> .env
+          echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env
+          echo "MAIL_AUTH_USER=${{ secrets.MAIL_AUTH_USER }}" >> .env
+          echo "MAIL_AUTH_PASS=${{ secrets.MAIL_AUTH_PASS }}" >> .env
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
+          echo "REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}" >> .env
+          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "GOOGLE_CALLBACK_URL=${{ secrets.GOOGLE_CALLBACK_URL }}" >> .env
+          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
+          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
+          echo "NAVER_CALLBACK_URL=${{ secrets.NAVER_CALLBACK_URL }}" >> .env
+          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
+          echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> .env
+          echo "KAKAO_CALLBACK_URL=${{ secrets.KAKAO_CALLBACK_URL }}" >> .env
+          echo "AWS_EB_APPLICATION_NAME=${{ secrets.AWS_EB_APPLICATION_NAME }}" >> .env
+          echo "AWS_EB_ENVIRONMENT_NAME=${{ secrets.AWS_EB_ENVIRONMENT_NAME }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
           cat .env
       # Initialize Node.js
       - name: Install Node.js ${{ matrix.node-version }}

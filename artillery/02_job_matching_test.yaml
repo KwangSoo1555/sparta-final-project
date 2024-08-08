@@ -1,0 +1,77 @@
+config:
+  target: 'http://localhost:3000'  # Change this to your server URL
+  phases:
+    - duration: 60  # Duration of the test in seconds
+      arrivalRate: 5  # Number of requests per second
+  processor: './process-response.js'  # Optional: script to process responses, if needed
+
+scenarios:
+  - name: 'Create Job Matching'
+    flow:
+      - post:
+          url: '/job-matching/:jobsId'
+          headers:
+            Content-Type: 'application/json'
+            Authorization: 'Bearer {{ accessToken }}'
+          json:
+            jobsId: '{{ jobId }}'
+          capture:
+            - json: '$.createMatching.id'
+              as: 'matchingId'
+
+  - name: 'Find All Applications'
+    flow:
+      - get:
+          url: '/job-matching/apply'
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'
+          capture:
+            - json: '$.Matching[0].id'
+              as: 'matchingId'
+
+  - name: 'Find All Job Applications'
+    flow:
+      - get:
+          url: '/job-matching/applications'
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'
+          capture:
+            - json: '$.Matching[0].id'
+              as: 'matchingId'
+
+  - name: 'Get Job Matching Details'
+    flow:
+      - get:
+          url: '/job-matching/:matchingId'
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'
+          capture:
+            - json: '$.Matching.id'
+              as: 'matchingId'
+
+  - name: 'Accept Job Matching'
+    flow:
+      - patch:
+          url: '/job-matching/accept/:matchingId'
+          headers:
+            Content-Type: 'application/json'
+            Authorization: 'Bearer {{ accessToken }}'
+          json:
+            matchingId: '{{ matchingId }}'
+
+  - name: 'Reject Job Matching'
+    flow:
+      - patch:
+          url: '/job-matching/reject/:matchingId'
+          headers:
+            Content-Type: 'application/json'
+            Authorization: 'Bearer {{ accessToken }}'
+          json:
+            matchingId: '{{ matchingId }}'
+
+  - name: 'Delete Job Matching'
+    flow:
+      - delete:
+          url: '/job-matching/:matchingId'
+          headers:
+            Authorization: 'Bearer {{ accessToken }}'

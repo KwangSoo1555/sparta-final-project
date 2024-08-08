@@ -284,7 +284,7 @@ export class AuthService {
     const user = await this.userRepository.findOne({
       where: { email: findPwDto.email, name: findPwDto.name },
     });
-
+    
     if (!user) throw new NotFoundException("가입되지 않은 계정입니다.");
 
     // 임시 비밀번호

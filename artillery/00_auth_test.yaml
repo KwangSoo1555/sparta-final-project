@@ -1,0 +1,50 @@
+config:
+  target: 'http://localhost:3000'  # Change this to your server URL
+  phases:
+    - duration: 60  # Duration of the test in seconds
+      arrivalRate: 5  # Number of requests per second
+  processor: './process-response.js'  # Optional: script to process responses, if needed
+
+scenarios:
+  - name: 'Sign Up'
+    flow:
+      - post:
+          url: '/auth/sign-up'
+          headers:
+            Content-Type: 'application/json'
+          json:
+            email: 'user@example.com'
+            name: 'John Doe'
+            password: 'password123'
+            verificationCode: 123456  # Replace with the actual verification code if needed
+            provider: ''  # Leave empty if not using social sign-up
+            socialId: ''  # Leave empty if not using social sign-up
+          capture:
+            - json: '$.data.id'
+              as: 'userId'
+
+  - name: 'Sign In'
+    flow:
+      - post:
+          url: '/auth/sign-in'
+          headers:
+            Content-Type: 'application/json'
+          json:
+            email: 'user@example.com'
+            password: 'password123'
+          capture:
+            - json: '$.accessToken'
+              as: 'accessToken'
+            - json: '$.refreshToken'
+              as: 'refreshToken'
+
+  - name: 'Sign Out'
+    flow:
+      - patch:
+          url: '/auth/sign-out'
+          headers:
+            Content-Type: 'application/json'
+            Authorization: 'Bearer {{ accessToken }}'
+          capture:
+            - json: '$.message'
+              as: 'signOutMessage'

@@ -1,1 +1,1 @@
-web: npm run eb:prod
+web: npm run start:prod
