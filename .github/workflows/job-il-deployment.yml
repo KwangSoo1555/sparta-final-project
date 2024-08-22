@@ -45,7 +45,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: task-definition.json # 작업 정의 템플릿 파일 이름
+          task-definition: sparta-final-project/task-definition.json # 작업 정의 템플릿 파일 이름
           container-name: sparta-final-project-backend-core-deployment # 컨테이너 이름
           image: 590183983800.dkr.ecr.ap-northeast-2.amazonaws.com/sparta-final-project-team7-server-origin:latest
 
