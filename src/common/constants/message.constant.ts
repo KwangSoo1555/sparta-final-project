@@ -101,6 +101,7 @@ export const MESSAGES = {
   },
   JOBMATCH: {
     CREATE: {
+      DUPLICATED: "이미 매칭된 내용입니다.",
       CREATE_SUCCEED: "성공적으로 신청되었습니다.",
     },
     READ: {

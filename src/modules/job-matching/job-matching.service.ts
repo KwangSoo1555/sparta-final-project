@@ -26,22 +26,24 @@ export class JobMatchingService {
 
   async create(customerId: number, jobsId: number) {
     const verifyUserbyId = await this.userRepository.findOne({
-      where: {
-        id: customerId,
-      },
+      where: { id: customerId },
     });
     if (verifyUserbyId === undefined || verifyUserbyId === null) {
       throw new NotFoundException(MESSAGES.USERS.COMMON.NOT_FOUND);
     }
 
-    const verifyJobbyId = await this.jobsRepository.findOne({
-      where: {
-        id: jobsId,
-        deletedAt: null,
-      },
+    const verifyJobById = await this.jobsRepository.findOne({
+      where: { id: jobsId, deletedAt: null },
     });
-    if (verifyJobbyId === undefined || verifyJobbyId === null) {
+    if (verifyJobById === undefined || verifyJobById === null) {
       throw new NotFoundException(MESSAGES.JOBS.NOT_EXISTS);
+    }
+
+    const duplicatedMatching = await this.jobsMatchingRepository.findOne({
+      where: { customerId, jobId: jobsId },
+    });
+    if (duplicatedMatching) {
+      throw new BadRequestException(MESSAGES.JOBMATCH.CREATE.DUPLICATED);
     }
 
     const data = await this.jobsMatchingRepository.save({
@@ -58,13 +60,14 @@ export class JobMatchingService {
         type: NotificationTypes.JOB_APPLIED,
         jobsId,
         customerId,
-        ownerId: verifyJobbyId.ownerId,
+        ownerId: verifyJobById.ownerId,
       }),
     );
 
     return data;
   }
 
+  // 내가 받은 지원 목록 조회
   async findAllApply(userId: number) {
     const data = await this.jobsMatchingRepository.find({
       relations: ["users", "job"],
@@ -100,6 +103,7 @@ export class JobMatchingService {
     return data;
   }
 
+  // 내가 지원한 목록 조회
   async findAllApplication(userId: number) {
     const data = await this.jobsMatchingRepository.find({
       relations: ["users", "job"],
@@ -139,9 +143,7 @@ export class JobMatchingService {
 
   async findOne(matchingId: number) {
     const data = await this.jobsMatchingRepository.findOne({
-      where: {
-        id: matchingId,
-      },
+      where: { id: matchingId },
     });
 
     return data;
