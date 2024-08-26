@@ -11,6 +11,7 @@ import {
   UnauthorizedException,
   NotFoundException,
   ConflictException,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -44,13 +45,6 @@ export class AuthService {
     @InjectRepository(RefreshTokensEntity)
     private readonly refreshTokenRepository: Repository<RefreshTokensEntity>,
   ) {
-    this.smtpTransport = nodemailer.createTransport({
-      service: "naver",
-      auth: {
-        user: this.configService.get<string>("MAIL_AUTH_USER"),
-        pass: this.configService.get<string>("MAIL_AUTH_PASS"),
-      },
-    });
     this.jwtAccessKey = this.configService.get<string>("ACCESS_TOKEN_SECRET");
     this.jwtRefreshKey = this.configService.get<string>("REFRESH_TOKEN_SECRET");
     this.jwtAccessOptions = { expiresIn: AUTH_CONSTANT.ACCESS_TOKEN_EXPIRES_IN };
@@ -73,24 +67,28 @@ export class AuthService {
         `,
     };
 
-    await this.redisClient.set(email, verificationCode, "EX", 300);
+    try {
+      await this.redisClient.set(email, verificationCode, "EX", 300);
 
-    await this.smtpTransport.sendMail(mailOptions);
+      await this.smtpTransport.sendMail(mailOptions);
 
-    console.log("code:", verificationCode);
+      console.log("code:", verificationCode);
 
-    const sendTime = new Date(timestamp).toLocaleString("ko-KR", {
-      timeZone: "Asia/Seoul",
-    });
+      const sendTime = new Date(timestamp).toLocaleString("ko-KR", {
+        timeZone: "Asia/Seoul",
+      });
 
-    return {
-      status: HttpStatus.OK,
-      message: MESSAGES.AUTH.SIGN_UP.EMAIL.SUCCEED,
-      data: {
-        code: verificationCode,
-        timestamp: sendTime,
-      },
-    };
+      return {
+        status: HttpStatus.OK,
+        message: MESSAGES.AUTH.SIGN_UP.EMAIL.SUCCEED,
+        data: {
+          code: verificationCode,
+          timestamp: sendTime,
+        },
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(MESSAGES.AUTH.SIGN_UP.EMAIL.FAIL);
+    }
   }
 
   private codeNumber(min: number, max: number) {
@@ -171,7 +169,7 @@ export class AuthService {
       withDeleted: true,
     });
 
-    let registeredUser: UsersEntity;
+    let registeredUser;
     if (softDeletedUser) {
       softDeletedUser.deletedAt = null;
       softDeletedUser.name = name;
@@ -189,9 +187,11 @@ export class AuthService {
 
     registeredUser.password = undefined;
 
-    const { password: _, ...userWithoutSensitiveInfo } = registeredUser;
+    const { password: _, verificationCode: __, ...result } = registeredUser;
+
     await this.redisClient.del(email);
-    return userWithoutSensitiveInfo;
+
+    return result;
   }
 
   async signIn(signInDto: LocalSignInDto, ip: string, userAgent: string) {
@@ -211,8 +211,7 @@ export class AuthService {
 
     await this.refreshTokenStore(user.id, refreshToken, ip, userAgent);
 
-    console.log("user.role : ", user.role);
-    return { accessToken, refreshToken, role: user.role };
+    return { accessToken, refreshToken, role: "user" };
   }
 
   async socialSignIn(
@@ -332,11 +331,11 @@ export class AuthService {
   }
 
   verifyToken(token: string): JwtPayload {
-    console.log(token);
-    if (token.includes("access")) {
-      return jwt.verify(token, this.jwtAccessKey) as JwtPayload;
-    } else {
-      return jwt.verify(token, this.jwtRefreshKey) as JwtPayload;
+    try {
+      const secret = this.configService.get<string>("ACCESS_TOKEN_SECRET");
+      return jwt.verify(token, secret) as JwtPayload;
+    } catch (error) {
+      throw new UnauthorizedException(MESSAGES.AUTH.TOKEN.INVALID);
     }
   }
 

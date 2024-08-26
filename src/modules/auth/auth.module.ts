@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule as NestTypeOrmModule } from "@nestjs/typeorm";
 import { JwtModule as NestJwtModule } from "@nestjs/jwt";
+import { SmtpModule } from "./smtp.module";
+
 import {
   AccessTokenStrategy,
   AccessTokenWsStrategy,
@@ -34,6 +36,7 @@ import { RefreshTokensEntity } from "src/entities/refresh-tokens.entity";
       }),
       inject: [ConfigService],
     }),
+    SmtpModule,
   ],
   controllers: [AuthController],
   providers: [

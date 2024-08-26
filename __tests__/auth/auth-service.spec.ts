@@ -76,8 +76,8 @@ describe("AuthService", () => {
             get: jest.fn((key: string) => {
               if (key === "MAIL_AUTH_USER") return "test@example.com";
               if (key === "MAIL_AUTH_PASS") return "password";
-              if (key === "ACCESS_TOKEN_SECRET") return "access_secret";
-              if (key === "REFRESH_TOKEN_SECRET") return "refresh_secret";
+              if (key === "ACCESS_TOKEN_SECRET") return "mocked-value";
+              if (key === "REFRESH_TOKEN_SECRET") return "mocked-value";
               return null;
             }),
           },
@@ -109,9 +109,9 @@ describe("AuthService", () => {
   });
 
   describe("sendAuthEmail", () => {
-    it('이메일 전송 실패 시 에러 발생', async () => {
-      const emailVerificationDto = { email: 'test@example.com' };
-      jest.spyOn(redisClient, 'set').mockResolvedValue('OK');
+    it("이메일 전송 실패 시 에러 발생", async () => {
+      const emailVerificationDto = { email: "test@example.com" };
+      jest.spyOn(redisClient, "set").mockResolvedValue("OK");
       nodemailerMock.mock.setShouldFailOnce();
 
       await expect(service.sendAuthEmail(emailVerificationDto)).rejects.toThrow(
@@ -519,7 +519,7 @@ describe("AuthService", () => {
         throw new Error("Invalid token");
       });
 
-      expect(() => service.verifyToken("invalid_token")).toThrow("Invalid token");
+      expect(() => service.verifyToken("invalid_token")).toThrow(UnauthorizedException);
     });
   });
 

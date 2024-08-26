@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "sparta-final-project-backend-core-deployment",
-      "image": "590183983800.dkr.ecr.ap-northeast-2.amazonaws.com/sparta-final-project-team7-server-origin:${IMAGE_TAG}",
+      "image": "590183983800.dkr.ecr.ap-northeast-2.amazonaws.com/sparta-final-project-team7-server-origin",
       "cpu": 0,
       "portMappings": [
         {
@@ -34,15 +34,14 @@
       "systemControls": []
     }
   ],
-  "executionRoleArn": "arn:aws:iam::590183983800:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::590183983800:role/ecsTaskExecutionCustomRole",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
-  "cpu": "1024",
-  "memory": "3072",
+  "cpu": "2048",
+  "memory": "4096",
   "runtimePlatform": {
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "tags": [],
-  "enableExecuteCommand": true
+  "tags": []
 }

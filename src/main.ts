@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { AppModule } from "./app.module";
 import { NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
@@ -6,8 +7,8 @@ import { ValidationPipe } from "@nestjs/common";
 import { IoAdapter } from "@nestjs/platform-socket.io";
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 
-import { WinstonLogger } from './modules/utils/winston.util';
-import { ExceptionsFilter } from './filters/exception.filter'
+import { WinstonLogger } from "./modules/utils/winston.util";
+import { ExceptionsFilter } from "./filters/exception.filter";
 
 declare const module: any;
 
@@ -16,11 +17,11 @@ async function bootstrap() {
     bufferLogs: true,
     logger: WinstonLogger, // replacing logger
   });
-  
+
   app.useGlobalFilters(new ExceptionsFilter());
 
   app.enableCors({
-    origin: '*', // 모든 도메인에서의 요청을 허용
+    origin: "*", // 모든 도메인에서의 요청을 허용
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"], // 허용할 헤더
     credentials: true, // 쿠키와 같은 인증 정보를 허용할지 여부

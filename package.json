@@ -58,7 +58,7 @@
     "passport-jwt": "^4.0.1",
     "passport-kakao": "^1.0.1",
     "passport-naver-v2": "^2.0.8",
-    "reflect-metadata": "^0.2.0",
+    "reflect-metadata": "^0.1.13",
     "rimraf": "^6.0.1",
     "rxjs": "^7.8.1",
     "socket.io-redis": "^6.1.1",
@@ -68,6 +68,7 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@golevelup/ts-jest": "^0.5.4",
     "@nestjs/cli": "^10.4.2",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.4.1",

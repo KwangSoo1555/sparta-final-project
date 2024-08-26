@@ -10,12 +10,12 @@ export const AUTH_CONSTANT = {
 
   // 이메일 인증 관련 상수
   AUTH_EMAIL: {
-    FROM: configService.get("MAIL_AUTH_USER"),
+    FROM: configService.get("SMTP_USER"),
     SUBJECT: "인증 관련 메일입니다.",
     HTML: "인증 번호입니다.",
   },
   TEMP_PASSWORD_EMAIL: {
-    FROM: configService.get("MAIL_AUTH_USER"),
+    FROM: configService.get("SMTP_USER"),
     SUBJECT: "임시 비밀번호 관련 메일입니다.",
     HTML: "임시 비밀번호입니다.",
   },

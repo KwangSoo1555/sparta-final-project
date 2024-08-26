@@ -1,9 +1,13 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { PassportStrategy, AuthGuard } from "@nestjs/passport";
 import { JwtPayload } from "jsonwebtoken";
+
+import { ConfigService } from "@nestjs/config";
 import { AuthService } from "../auth.service";
+
+import { UsersEntity } from "src/entities/users.entity";
+
 import { MESSAGES } from "src/common/constants/message.constant";
 import { Socket } from "socket.io";
 
@@ -31,10 +35,11 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, "accessToken
       secretOrKey: configService.get<string>("ACCESS_TOKEN_SECRET"),
     });
   }
-  async validate(payload: JwtPayload) {
-    const { userId } = payload;
-    const user = await this.authService.checkUserForAuth({ id: userId });
-    if (!user) throw new UnauthorizedException(MESSAGES.AUTH.COMMON.JWT.INVALID);
+  async validate(payload: JwtPayload): Promise<UsersEntity> {
+    const user = await this.authService.checkUserForAuth(payload.userId);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
     return user;
   }
 }
@@ -51,11 +56,11 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, "refreshTok
       secretOrKey: configService.get<string>("REFRESH_TOKEN_SECRET"),
     });
   }
-  async validate(payload: JwtPayload) {
-    //: Promise<UserAuthEntity> 함수의 타입을 명시합시다.
-    const { userId } = payload;
-    const user = await this.authService.checkUserForAuth({ id: userId });
-    if (!user) throw new UnauthorizedException(MESSAGES.AUTH.COMMON.JWT.INVALID);
+  async validate(payload: JwtPayload): Promise<UsersEntity> {
+    const user = await this.authService.checkUserForAuth(payload.userId);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
     return user;
   }
 }
@@ -71,11 +76,11 @@ export class AccessTokenWsStrategy extends PassportStrategy(Strategy, "accessTok
       secretOrKey: configService.get<string>("ACCESS_TOKEN_SECRET"),
     });
   }
-  async validate(payload: JwtPayload) {
-    const { userId } = payload;
-    const user = await this.authService.checkUserForAuth({ id: userId });
-    if (!user) throw new UnauthorizedException(MESSAGES.AUTH.COMMON.JWT.INVALID);
-
+  async validate(payload: JwtPayload): Promise<UsersEntity> {
+    const user = await this.authService.checkUserForAuth(payload.userId);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
     return user;
   }
 }

@@ -70,7 +70,7 @@ export class NaverPassportStrategy extends PassportStrategy(NaverStrategy, "nave
     try {
       const naverSignInDto: SocialSignInDto = {
         email: email,
-        provider: provider as SocialProviders,
+        provider: provider.toUpperCase() as SocialProviders,
         socialId: id,
         name: name,
       };
@@ -111,7 +111,7 @@ export class KakaoPassportStrategy extends PassportStrategy(KakaoStrategy, "kaka
     try {
       const kakaoSignInDto: SocialSignInDto = {
         email: email,
-        provider: provider as SocialProviders,
+        provider: provider.toUpperCase() as SocialProviders,
         socialId: id,
         name: username,
       };
