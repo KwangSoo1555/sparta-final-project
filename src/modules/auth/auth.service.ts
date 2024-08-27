@@ -45,6 +45,7 @@ export class AuthService {
     @InjectRepository(RefreshTokensEntity)
     private readonly refreshTokenRepository: Repository<RefreshTokensEntity>,
   ) {
+    this.smtpTransport = smtpTransport;
     this.jwtAccessKey = this.configService.get<string>("ACCESS_TOKEN_SECRET");
     this.jwtRefreshKey = this.configService.get<string>("REFRESH_TOKEN_SECRET");
     this.jwtAccessOptions = { expiresIn: AUTH_CONSTANT.ACCESS_TOKEN_EXPIRES_IN };
@@ -70,7 +71,9 @@ export class AuthService {
     try {
       await this.redisClient.set(email, verificationCode, "EX", 300);
 
-      await this.smtpTransport.sendMail(mailOptions);
+      console.log("Sending email:", mailOptions);
+      const info = await this.smtpTransport.sendMail(mailOptions);
+      console.log("Email sent:", info);
 
       console.log("code:", verificationCode);
 
@@ -87,6 +90,7 @@ export class AuthService {
         },
       };
     } catch (error) {
+      console.error("Email sending failed:", error);
       throw new InternalServerErrorException(MESSAGES.AUTH.SIGN_UP.EMAIL.FAIL);
     }
   }

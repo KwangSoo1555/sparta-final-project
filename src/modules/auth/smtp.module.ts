@@ -1,9 +1,10 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
 import * as nodemailer from "nodemailer";
+import { Module, forwardRef } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { AuthModule } from "./auth.module";
 
 @Module({
-  imports: [ConfigModule],
+  imports: [forwardRef(() => AuthModule), ConfigModule],
   providers: [
     {
       provide: "SMTP_TRANSPORT",

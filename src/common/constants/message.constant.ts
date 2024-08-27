@@ -76,6 +76,7 @@ export const MESSAGES = {
   JOBS: {
     CREATE: {
       CREATE_SUCCEED: "성공적으로 생성되었습니다.",
+      DUPLICATE: "이미 존재하는 JOB일 입니다.",
     },
     READ: {
       READ_SUCCEED: "성공적으로 조회되었습니다.",
@@ -92,10 +93,15 @@ export const MESSAGES = {
     MATCHING: {
       MATCHING_SUCCEED: "성공적으로 매칭되었습니다.",
       NOT_VERIFY: "매칭 권한이 없습니다.",
+      ALREADY_MATCHED: "이미 매칭된 JOB입니다.",
     },
     CANCEL: {
       CANCEL_SUCCEED: "성공적으로 취소되었습니다.",
       NOT_VERIFY: "취소 권한이 없습니다.",
+    },
+    LOCALCODES: {
+      NOT_FOUND: "지역 코드를 찾을 수 없습니다.",
+      NOT_FOUND_ADDRESS: "주소를 찾을 수 없습니다.",
     },
     NOT_EXISTS: "존재하지 않는 내용입니다.",
   },

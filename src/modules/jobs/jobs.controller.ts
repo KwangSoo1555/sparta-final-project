@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpStatus,
   Query,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { JwtAccessGuards } from "src/modules/auth/strategies/jwt-strategy";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
@@ -71,8 +72,8 @@ export class JobsController {
    * @returns
    */
   @Get(":jobsId")
-  async findOne(@Param("jobsId") jobsId: string) {
-    const job = await this.jobsService.findOne(+jobsId);
+  async findOne(@Param("jobsId", ParseIntPipe) jobsId) {
+    const job = await this.jobsService.findOne(jobsId);
     return {
       statusCode: HttpStatus.CREATED,
       message: MESSAGES.JOBS.READ.READ_SUCCEED,
@@ -88,11 +89,11 @@ export class JobsController {
    */
   @Patch(":jobsId")
   async update(
-    @Param("jobsId") jobsId: string,
+    @Param("jobsId", ParseIntPipe) jobsId,
     @RequestJwtByHttp() { user: { id: userId } },
     @Body() updateJobDto: UpdateJobDto,
   ) {
-    const updateJob = await this.jobsService.update(userId, +jobsId, updateJobDto);
+    const updateJob = await this.jobsService.update(userId, jobsId, updateJobDto);
     return {
       statusCode: HttpStatus.CREATED,
       message: MESSAGES.JOBS.UPDATE.UPDATE_SUCCEED,
@@ -106,8 +107,11 @@ export class JobsController {
    * @returns
    */
   @Patch("matching/:jobsId")
-  async updateJobYn(@Param("jobsId") jobsId: string, @RequestJwtByHttp() { user: { id: userId } }) {
-    const updateJob = await this.jobsService.updateJobYn(userId, +jobsId);
+  async updateJobYn(
+    @Param("jobsId", ParseIntPipe) jobsId,
+    @RequestJwtByHttp() { user: { id: userId } },
+  ) {
+    const updateJob = await this.jobsService.updateJobYn(userId, jobsId);
     return {
       statusCode: HttpStatus.CREATED,
       message: MESSAGES.JOBS.MATCHING.MATCHING_SUCCEED,
@@ -122,10 +126,10 @@ export class JobsController {
    */
   @Patch("cancel/:jobsId")
   async updateJobCancelYn(
-    @Param("jobsId") jobsId: string,
+    @Param("jobsId", ParseIntPipe) jobsId,
     @RequestJwtByHttp() { user: { id: userId } },
   ) {
-    const updateJob = await this.jobsService.updateJobCancelYn(userId, +jobsId);
+    const updateJob = await this.jobsService.updateJobCancelYn(userId, jobsId);
     return {
       statusCode: HttpStatus.CREATED,
       message: MESSAGES.JOBS.CANCEL.CANCEL_SUCCEED,
@@ -139,8 +143,11 @@ export class JobsController {
    * @returns
    */
   @Delete(":jobsId")
-  async remove(@Param("jobsId") jobsId: string, @RequestJwtByHttp() { user: { id: userId } }) {
-    const deleteJob = await this.jobsService.remove(userId, +jobsId);
+  async remove(
+    @Param("jobsId", ParseIntPipe) jobsId,
+    @RequestJwtByHttp() { user: { id: userId } },
+  ) {
+    const deleteJob = await this.jobsService.remove(userId, jobsId);
     return {
       statusCode: HttpStatus.CREATED,
       message: MESSAGES.JOBS.DELETE.DELETE_SUCCEED,

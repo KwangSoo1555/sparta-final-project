@@ -84,9 +84,7 @@ describe("AuthService", () => {
         },
         {
           provide: "SMTP_TRANSPORT",
-          useValue: {
-            sendMail: jest.fn(),
-          },
+          useValue: nodemailerMock.createTransport({}),
         },
       ],
     }).compile();

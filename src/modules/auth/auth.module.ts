@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule as NestTypeOrmModule } from "@nestjs/typeorm";
 import { JwtModule as NestJwtModule } from "@nestjs/jwt";
 import { SmtpModule } from "./smtp.module";
@@ -36,7 +36,7 @@ import { RefreshTokensEntity } from "src/entities/refresh-tokens.entity";
       }),
       inject: [ConfigService],
     }),
-    SmtpModule,
+    forwardRef(() => SmtpModule),
   ],
   controllers: [AuthController],
   providers: [
