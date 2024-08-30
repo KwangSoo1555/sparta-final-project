@@ -50,11 +50,24 @@ export class RedisConfig {
     return this.redisClient.get(`user:${userId.toString()}: socketId`);
   }
 
-  async setNotice(cacheKey: string, data: any){
-    return this.redisClient.set(cacheKey, JSON.stringify(data), 'EX', 1800);
+  async setNotice(cacheKey: string, data: any) {
+    return this.redisClient.set(cacheKey, JSON.stringify(data), 'EX', 300); // 300초 = 5분
   }
-
+  
   async getNotice(cacheKey:string){
     return this.redisClient.get(cacheKey)
   }
+
+  async setJob(cacheKey: string, data: any) {
+    return this.redisClient.set(cacheKey, JSON.stringify(data), 'EX', 120); // 300초 = 5분
+  }
+
+  async getJob(cacheKey:string){
+    return this.redisClient.get(cacheKey)
+  }
+
+  async removeNotice(cacheKey: string) {
+    await this.redisClient.del(cacheKey);
+  }
+  
 }

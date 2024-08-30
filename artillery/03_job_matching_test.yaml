@@ -1,26 +1,26 @@
-config:
-  target: 'http://localhost:3333'
-  phases:
-    - duration: 60
-      arrivalRate: 10
-  defaults:
-    headers:
-      Content-Type: 'application/json'
-  processor: './functions.mjs'
+# config:
+#   target: 'http://localhost:3333'
+#   phases:
+#     - duration: 60
+#       arrivalRate: 10
+#   defaults:
+#     headers:
+#       Content-Type: 'application/json'
+#   processor: './functions.mjs'
 
-scenarios:
-  - name: 'Create Job Matching'
-    flow:
-      - post:
-          url: '/job-matching/:jobsId'
-          json:
-            jobsId: '{{ jobId }}'
-          beforeRequest: 
-            - beforeRequestWithUser('user1_naver_com')
-            - loadJobId
-          capture:
-            - json: '$.createMatching.id'
-              as: 'matchingId'
+# scenarios:
+#   - name: 'Create Job Matching'
+#     flow:
+#       - post:
+#           url: '/job-matching/:jobsId'
+#           json:
+#             jobsId: '{{ jobId }}'
+#           beforeRequest: 
+#             - beforeRequestWithUser('user1_naver_com')
+#             - loadJobId
+#           capture:
+#             - json: '$.createMatching.id'
+#               as: 'matchingId'
 
   # - name: 'Find All Applications'
   #   flow:

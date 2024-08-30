@@ -1,16 +1,18 @@
 config:
-  target: 'http://127.0.0.1:3333'
+  target: 'http://localhost:3333'
   phases:
     - duration: 60
-      arrivalRate: 1
+      arrivalRate: 150
   defaults:
     headers:
       Content-Type: 'application/json'
+      Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwMSwidHlwZSI6IkFDQ0VTUyIsImlhdCI6MTcyNDk3OTA1NCwiZXhwIjoxNzI0OTgyNjU0fQ.Uvhipeh_RNCLW_GoQmGJXwFyRqOvQsFbzsBt1-eo6Zw'  # 여기에 실제 토큰을 입력하세요.
   processor: './functions.mjs'  # 사용자 정의 함수 파일 경로
 
 scenarios:
   - name: 'Fetch Notices Page 1'
     flow:
+      # - beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
       - get:
           url: '/api/v1/notices'
           qs:
@@ -19,25 +21,33 @@ scenarios:
           capture:
             - json: '$.data'
               as: 'notices'
-  beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
 
   - name: 'Fetch Notices Page 3'
     flow:
+      # - beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
       - get:
           url: '/api/v1/notices'
           qs:
-            page: 3
+            page: 1
             limit: 2
           capture:
             - json: '$.data'
               as: 'notices'
-  beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
       
   - name: 'Fetch Jobs'
     flow:
+      # - beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
       - get:
           url: '/api/v1/jobs'
           capture:
             - json: '$.jobs'
               as: 'jobs'
-  beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
+
+  - name: 'Fetch Jobs'
+    flow:
+      # - beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
+      - get:
+          url: '/api/v1/jobs'
+          capture:
+            - json: '$.jobs'
+              as: 'jobs'

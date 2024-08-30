@@ -18,6 +18,7 @@ import { AuthController } from "./auth.controller";
 
 import { UsersEntity } from "src/entities/users.entity";
 import { RefreshTokensEntity } from "src/entities/refresh-tokens.entity";
+import * as nodemailer from 'nodemailer';
 
 @Module({
   imports: [
@@ -44,6 +45,19 @@ import { RefreshTokensEntity } from "src/entities/refresh-tokens.entity";
     GooglePassportStrategy,
     NaverPassportStrategy,
     KakaoPassportStrategy,
+    {
+      provide: 'SMTP_TRANSPORT',
+      useFactory: async (configService: ConfigService) => {
+        return nodemailer.createTransport({
+          service: 'naver',
+          auth: {
+            user: configService.get<string>('MAIL_AUTH_USER'),
+            pass: configService.get<string>('MAIL_AUTH_PASS'),
+          },
+        });
+      },
+      inject: [ConfigService],
+    },
   ],
   exports: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
 })

@@ -12,6 +12,8 @@ export class NoticesService {
   constructor(
     @InjectRepository(NoticesEntity)
     private readonly noticeRepository: Repository<NoticesEntity>,
+    private readonly redisConfig: RedisConfig,
+
   ) {}
 
   // 공지사항 생성
@@ -27,7 +29,15 @@ export class NoticesService {
   // 공지사항 목록 조회
   async getNotices(page: number, limit: number) {
     const offset = (page - 1) * limit;
+    const cacheKey = `notices:${page}:${limit}`; // 캐시 키 생성
 
+    // Redis에서 캐시된 데이터 조회
+    const cachedData = await this.redisConfig.getNotice(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData); // 캐시된 데이터가 있으면 반환
+    }
+
+    // 데이터베이스에서 공지사항 조회
     const [notices, totalNotices] = await this.noticeRepository.findAndCount({
       skip: offset,
       take: limit,
@@ -36,7 +46,7 @@ export class NoticesService {
 
     const totalPages = Math.ceil(totalNotices / limit);
 
-    return {
+    const result = {
       data: notices,
       meta: {
         totalItems: totalNotices,
@@ -45,6 +55,11 @@ export class NoticesService {
         totalPages,
       },
     };
+
+    // 조회한 데이터를 Redis에 캐시
+    await this.redisConfig.setNotice(cacheKey, result); // 5분 동안 캐시
+
+    return result;
   }
   // 공지사항 상세 조회
   async getNoticeDetail(noticeId: number): Promise<NoticesEntity> {

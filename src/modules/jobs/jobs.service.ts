@@ -8,52 +8,62 @@ import { UpdateJobDto } from "./dto/update-job.dto";
 import { JobsEntity } from "src/entities/jobs.entity";
 import { UsersEntity } from "src/entities/users.entity";
 import { LocalCodesEntity } from "src/entities/local-codes.entity";
+import { RedisConfig } from "src/database/redis/redis.config";
 @Injectable()
 export class JobsService {
   constructor(
     @InjectRepository(JobsEntity) private jobsRepository: Repository<JobsEntity>,
     @InjectRepository(UsersEntity) private UserRepository: Repository<UsersEntity>,
     @InjectRepository(LocalCodesEntity) private localcodesRepository: Repository<LocalCodesEntity>,
+    private readonly redisConfig: RedisConfig,
   ) {}
   async create(createJobDto: CreateJobDto, userId: number) {
     const { title, content, photoUrl, price, city, district, dong, category } = createJobDto;
+  
+    // 사용자 검증
     const verifyUserbyId = await this.UserRepository.findOne({
       where: {
         id: userId,
       },
     });
-    if (verifyUserbyId === undefined || verifyUserbyId === null) {
+    if (!verifyUserbyId) {
       throw new NotFoundException(MESSAGES.USERS.COMMON.NOT_FOUND);
     }
+  
+    // 지역 코드 가져오기
     const localCode = await this.getLocalcodes(city, district, dong);
-    if (photoUrl != "") {
-      const data = await this.jobsRepository.save({
-        ownerId: userId,
-        title,
-        content,
-        photoUrl,
-        price,
-        address: localCode,
-        category,
-        expiredYn: false,
-        matchedYn: false,
-      });
-      return data;
-    } else {
-      const data = await this.jobsRepository.save({
-        ownerId: userId,
-        title,
-        content,
-        price,
-        address: localCode,
-        category,
-        expiredYn: false,
-        matchedYn: false,
-      });
-      return data;
-    }
+  
+    // 잡일 데이터 저장
+    const jobData = {
+      ownerId: userId,
+      title,
+      content,
+      photoUrl: photoUrl || null, // photoUrl이 없으면 null로 설정
+      price,
+      address: localCode,
+      category,
+      expiredYn: false,
+      matchedYn: false,
+    };
+  
+    const data = await this.jobsRepository.save(jobData);
+  
+    // 캐시 무효화
+    await this.redisConfig.removeNotice('jobs:all'); // 캐시 무효화
+  
+    return data;
   }
+  
   async findAll() {
+    const cacheKey = 'jobs:all'; // 캐시 키 생성
+  
+    // Redis에서 캐시된 데이터 조회
+    const cachedData = await this.redisConfig.getJob(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData); // 캐시된 데이터가 있으면 반환
+    }
+  
+    // 데이터베이스에서 작업 조회
     const data = await this.jobsRepository.find({
       where: {
         expiredYn: false,
@@ -61,8 +71,13 @@ export class JobsService {
       },
       order: { createdAt: "DESC" },
     });
+  
+    // 조회한 데이터를 Redis에 캐시
+    await this.redisConfig.setJob(cacheKey, data); // 5분 동안 캐시
+  
     return data;
   }
+  
   async findOne(jobsId: number) {
     const data = await this.jobsRepository.findOne({
       where: {

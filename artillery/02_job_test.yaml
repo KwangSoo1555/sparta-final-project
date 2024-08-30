@@ -1,32 +1,32 @@
-config:
-  target: 'http://localhost:3333'
-  phases:
-    - duration: 60
-      arrivalRate: 1
-  defaults:
-    headers:
-      Content-Type: 'application/json'
-  processor: './functions.mjs'
+# config:
+#   target: 'http://localhost:3333'
+#   phases:
+#     - duration: 60
+#       arrivalRate: 1
+#   defaults:
+#     headers:
+#       Content-Type: 'application/json'
+#   processor: './functions.mjs'
 
-scenarios:
-  - name: 'Create, Update, and Retrieve Job'
-    flow:
-      - post:
-          url: '/api/v1/jobs'
-          json:
-            title: 'Sample Job Title'
-            content: 'This is a sample job description.'
-            photoUrl: 'http://example.com/photo.jpg'
-            price: 1000
-            city: '서울특별시'
-            district: '종로구'
-            dong: '청운효자동'
-            category: '사무직'
-          capture:
-            - json: '$.createJob.id'
-              as: 'jobId'
-    beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
-    afterResponse: afterResponse
-      - get:
-          url: '/api/v1/jobs/{{ jobId }}'
-      beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
+# scenarios:
+#   - name: 'Create, Update, and Retrieve Job'
+#     flow:
+#       - post:
+#           url: '/api/v1/jobs'
+#           json:
+#             title: 'Sample Job Title'
+#             content: 'This is a sample job description.'
+#             photoUrl: 'http://example.com/photo.jpg'
+#             price: 1000
+#             city: '서울특별시'
+#             district: '종로구'
+#             dong: '청운효자동'
+#             category: '사무직'
+#           capture:
+#             - json: '$.createJob.id'
+#               as: 'jobId'
+#     beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')
+#     afterResponse: afterResponse
+#       - get:
+#           url: '/api/v1/jobs/{{ jobId }}'
+#       beforeRequest: beforeRequestWithUser('vlsual0917_gmail_com')

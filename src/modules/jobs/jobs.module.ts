@@ -8,10 +8,11 @@ import { JobsController } from "./jobs.controller";
 import { JobsEntity } from "src/entities/jobs.entity";
 import { UsersEntity } from "src/entities/users.entity";
 import { LocalCodesEntity } from "src/entities/local-codes.entity";
+import { RedisConfig } from "src/database/redis/redis.config";
 
 @Module({
   imports: [TypeOrmModule.forFeature([JobsEntity, UsersEntity, LocalCodesEntity]), AuthModule],
   controllers: [JobsController],
-  providers: [JobsService],
+  providers: [JobsService, RedisConfig],
 })
 export class JobsModule {}
